@@ -1,0 +1,110 @@
+.top-bar {
+    background-color: #ff6b2b;
+    text-align: center;
+    padding: 15px;
+}
+
+html,
+body {
+    margin: 0;
+    padding: 0;
+    ;
+}
+
+body {
+    font-family: 'Lato,Arial, Helvetica, sans-serif';
+    font-size: 20px;
+}
+
+#cabecalho {
+    background: url("./images/hero_bolo.jpg");
+    height: 400px;
+    background-size: cover;
+    background-position: center;
+}
+
+h1,
+h2,
+h3 {
+    color: #ff6b2b;
+}
+
+
+.conteudo {
+    max-width: 990px;
+    margin: auto;
+    padding: 40px;
+    margin-top: 100px;
+}
+
+h1 {
+    font-size: 48px;
+}
+
+h2 {
+    font-size: 28px;
+    margin-bottom: 40px;
+}
+
+a {
+    text-decoration: none;
+
+}
+
+.cartao:hover {
+    box-shadow: 8px 8px 15px 12px rgba(205, 205, 205, 0.25)
+}
+
+.cartao {
+    padding: 70px 100px;
+    margin-top: 50px;
+    border-radius: 20px;
+    /*border:1px solid */
+}
+
+.ingredientes {
+    cursor: url("./images/cursor_ingredientes.png"), auto
+}
+
+.preparo {
+    cursor: url("./images/cursor_preparo.png"), auto
+}
+
+.botao-compra {
+    background-color: #ff6b2b;
+    padding: 16px;
+    border-radius: 20px;
+    color: white;
+}
+
+li {
+    margin-bottom: 14px;
+}
+
+.lista-ingredientes {
+    margin-bottom: 50px;
+}
+
+.instrucoes {
+    cursor: url("./images/cursor_intrucoes.png"), auto
+}
+
+p,
+li {
+    line-height: 28px;
+}
+
+.rodape {
+    background-color: #ff6b2b;
+    color: white;
+    padding: 15px;
+    text-align: center;
+}
+
+.rodape-texto {
+    max-width: 500px;
+    margin: auto;
+    font-size: 16px;
+    line-height: 24px;
+}
+.mail{color:black}

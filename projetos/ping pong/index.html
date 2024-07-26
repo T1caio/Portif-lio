@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="pt">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ping Pong</title>
+    <style>
+        * {
+            overflow: hidden;
+            margin: 0;
+            padding: 0;
+        }
+    </style>
+</head>
+
+<body>
+    <canvas></canvas>
+    <script>
+        const canvasEl = document.querySelector("canvas")
+        const canvasCTX = canvasEl.getContext("2d")
+        const linewidth = 15
+        const gapx = 10
+        const mouse = { x: 0, y: 0 }
+        //faz o campo
+        const field = {
+            w: window.innerWidth,
+            h: window.innerHeight,
+            draw: function () {
+                canvasCTX.fillStyle = "#286047"
+                canvasCTX.fillRect(0, 0, this.w, this.h)
+            },
+        }
+        //faz a linha central
+        const line = {
+            w: 15,
+            h: field.h,
+            draw: function () {
+                canvasCTX.fillStyle = "#ffffff"
+                canvasCTX.fillRect(field.w / 2 - this.w / 2, 0, this.w, this.h)
+            },
+        }
+        //faz a raquete l
+        const lracket = {
+            x: gapx,
+            y: 0,
+            w: line.w,
+            h: 200,
+            _move: function () {
+                this.y = mouse.y - this.h / 2
+            },
+            draw: function () {
+                canvasCTX.fillRect(this.x, this.y, this.w, this.h)
+                this._move()
+            }
+        }
+        //faz a raquete r
+        const rracket = {
+            x: field.w - line.w - gapx,
+            y: 100,
+            w: line.w,
+            h: 200,
+            speed:4,
+            _move: function () {
+               if(this.y+this.h/2<ball.y+ball.r){this.y+=this.speed}else{this.y-=this.speed}
+            },
+            draw: function () {
+                canvasCTX.fillRect(this.x, this.y, this.w, this.h)
+                this._move()
+            }
+        }
+        //faz o placar
+        const scoreboard = {
+            human: 0,
+            computer: 0,
+            pointhuman: function () { this.human++ },
+            pointcomputer: function () { this.computer++ },
+            draw: function () {
+                canvasCTX.font = "bold 72px Arial"
+                canvasCTX.textAlign = "center"
+                canvasCTX.textBaseline = "top"
+                canvasCTX.fillStyle = "#01341D"
+                canvasCTX.fillText(this.human, field.w / 4, 50)
+                canvasCTX.fillText(this.computer, field.w / 4 + field.w / 2, 50)
+            },
+        }
+        //faz a bola
+        const ball = {
+            x: field.w/2,
+            y: field.h/2,
+            r: 20,
+            speed: 5,
+            directionX: 1,
+            directionY: 1,
+            _calcposition: function () {
+                //verifica se houve pontuaçao j1
+                if (this.x > field.w - this.r - rracket.w - gapx) {
+                    //verifica se a bola vai bater na raquete
+                    if (this.y + this.r > rracket.y && this.y - this.r < rracket.y + rracket.h) { this._reverseX() }
+                    //pontuar jogador 1
+                    else {
+                        scoreboard.pointhuman()
+                        this._pointUp()
+                    }
+                }
+                //verifica pontuaçao j2
+                if (this.x < gapx + this.r + lracket.w) {
+                    if (this.y + this.r > lracket.y && this.y - this.r < lracket.y + lracket.h) { this._reverseX() } else {
+                        scoreboard.pointcomputer()
+                        this._pointUp()
+                    }
+                }
+                if ((this.y - this.r < 0 && this.directionY < 0) || (this.y > field.h - this.r && this.directionY > 0)) { this._reverseY() }
+            },
+            _speedUp: function () {
+                this.speed += 1.5
+            },
+            _pointUp: function () {
+                this._speedUp()
+                this.x = field.w / 2
+                this.y = field.h / 2
+            },
+            _move: function () {
+                this.x += this.directionX * this.speed
+                this.y += this.directionY * this.speed
+            },
+            _reverseY: function () { this.directionY *= -1 },
+            _reverseX: function () { this.directionX *= -1 },
+            draw: function () {
+                canvasCTX.fillStyle = "#ffffff"
+                canvasCTX.beginPath()
+                canvasCTX.arc(this.x, this.y, this.r, 0, 2 * Math.PI, false)
+                canvasCTX.fill()
+                this._calcposition()
+                this._move()
+            }
+        }
+        function setup() {
+            canvasEl.width = canvasCTX.width = field.w
+            canvasEl.height = canvasCTX.height = field.h
+        }
+        function draw() {
+
+            field.draw()
+            line.draw()
+            lracket.draw()
+            rracket.draw()
+            scoreboard.draw()
+            ball.draw()
+        }
+        window.animateFrame = (function () {
+            return (
+                window.requestAnimationFrame ||
+                window.webkitRequestAnimationFrame ||
+                window.mozRequestAnimationFrame ||
+                window.oRequestAnimationFrame ||
+                window.msRequestAnimationFrame ||
+                function (callback) {
+                    return window.setTimeout(callback, 1000 / 60)
+                }
+            )
+        })()
+        function main() {
+            animateFrame(main)
+            draw()
+        }
+        setup()
+        main()
+        canvasEl.addEventListener("mousemove", function (e) {
+            mouse.x = e.pageX
+            mouse.y = e.pageY
+            console.log(mouse)
+        })
+
+    </script>
+
+</body>
+
+</html>

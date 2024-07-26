@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jogo da Cobrinha</title>
+    <style>
+        * {
+            overflow: hidden;
+            margin: 0;
+            padding: 0;
+
+        }
+
+        canvas {
+            display: block;
+        }
+    </style>
+</head>
+
+<body>
+    <canvas></canvas>
+    <script>
+        const canvasEL = document.querySelector("canvas")
+        const canvasCTX = canvasEL.getContext("2d")
+        let gameruning = true
+        //campo
+        const campo = {
+            w: window.innerWidth,
+            h: window.innerHeight,
+            draw: function () {
+                canvasCTX.fillStyle = "#696969"
+                canvasCTX.fillRect(0, 0, this.w, this.h)
+
+            }
+        }
+        //placar
+        const ponto = {
+            draw: function () {
+                canvasCTX.fillStyle = "#C0C0C0"
+                canvasCTX.font = "bold 150px Arial"
+                canvasCTX.textAlign = "center"
+                canvasCTX.textBaseline = "center"
+                canvasCTX.fillText(pontuaçao, campo.w / 2, campo.h / 2)
+            }
+        }
+        //fruta
+        const fruta = {
+            x: 0,
+            y: 0,
+            hh: 20,
+            ww: 20,
+            draw: function () {
+                canvasCTX.fillStyle = "#FF6347"
+                canvasCTX.fillRect(this.x, this.y, this.ww, this.hh)
+            },
+            //spawn da fruta
+            spawn: function () {
+                this.x = Math.floor(Math.random() * (campo.w - this.ww))
+                this.y = Math.floor(Math.random() * (campo.h - this.hh))
+            }
+        }
+        //cobra
+        const cobra = {
+            x: 0,
+            y: 0,
+            w: 20,
+            h: 20,
+            dx: 0,
+            dy: 0,
+            body: [{ x: 70, y: 70 }],
+            _spawn: function () {
+                this.x = Math.floor(Math.random() * (campo.w - this.ww))
+                this.y = Math.floor(Math.random() * (campo.h - this.hh))
+            },
+            draw: function () {
+                canvasCTX.fillStyle = "#000080"
+                this.body.forEach(segment => { canvasCTX.fillRect(segment.x, segment.y, this.w, this.h) })
+
+
+            },
+            update: function () {
+                this.x += this.dx;
+                this.y += this.dy;
+                this.x = Math.max(0, Math.min(this.x, campo.w - this.w))
+                this.y = Math.max(0, Math.min(this.y, campo.h - this.h))
+
+                const newHead = { x: this.body[0].x + this.dx, y: this.body[0].y + this.dy };
+
+                // Check for wall collision
+                if (newHead.x < 0 || newHead.x >= campo.w || newHead.y < 0 || newHead.y >= campo.h) {
+                    gameOver();
+                    return;
+                }
+
+                // Check for self collision
+                for (let i = 1; i < this.body.length; i++) {
+                    if (newHead.x === this.body[i].x && newHead.y === this.body[i].y) {
+                        gameOver();
+                        return;
+                    }
+                }
+
+
+                this.body.unshift(newHead);
+                if (newHead.x < fruta.x + fruta.ww &&
+                    newHead.x + this.w > fruta.x &&
+                    newHead.y < fruta.y + fruta.hh &&
+                    newHead.y + this.h > fruta.y) {
+                    pontuaçao++;
+                    fruta.spawn();
+                } else {
+                    this.body.pop();
+                }
+
+            }
+
+        }
+        //variaveis da movimentação
+        const speed = 3
+        let pontuaçao = 0
+        function setup() {
+            canvasEL.width = campo.w
+            canvasEL.height = campo.h
+            fruta.spawn()
+
+            window.addEventListener('keydown', (e) => {
+                if (e.key === 'w' || e.key === 'ArrowUp') {
+                    if (cobra.dy === 0) {
+                        cobra.dx = 0;
+                        cobra.dy = -speed
+                    }
+                }
+                if (e.key === 's' || e.key === 'ArrowDown') {
+                    if (cobra.dy === 0) {
+                        cobra.dx = 0;
+                        cobra.dy = speed;
+                    }
+                }
+                if (e.key === 'a' || e.key === 'ArrowLeft') {
+                    if (cobra.dx === 0) {
+                        cobra.dx = -speed;
+                        cobra.dy = 0
+                    }
+                }
+                if (e.key === 'd' || e.key === 'ArrowRight') {
+                    if (cobra.dx === 0) {
+                        cobra.dx = speed;
+                        cobra.dy = 0
+                    }
+                }
+            })
+        }
+        function draw() {
+            campo.draw()
+            ponto.draw()
+            fruta.draw()
+            cobra.draw()
+
+        }
+        function gameLoop() {
+            if (gameruning) {
+                draw();
+                cobra.update();
+                requestAnimationFrame(gameLoop);
+            }
+        }
+        function gameOver() {
+            gameruning = false;
+            canvasCTX.fillStyle = "rgba(0, 0, 0, 0.5)";
+            canvasCTX.fillRect(0, 0, campo.w, campo.h);
+            canvasCTX.fillStyle = "#FF0000";
+            canvasCTX.font = "bold 100px Arial";
+            canvasCTX.textAlign = "center";
+            canvasCTX.textBaseline = "middle";
+            canvasCTX.fillText("Game Over", campo.w / 2, campo.h / 2);
+        }
+
+        setup()
+        gameLoop()
+
+
+
+
+    </script>
+</body>
+
+</html>
